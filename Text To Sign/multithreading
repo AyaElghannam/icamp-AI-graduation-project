@@ -1,0 +1,92 @@
+import asyncio,bpy
+import bpy
+
+def render_pose(nframes):
+    scene = bpy.data.scenes['Scene']
+    scene.frame_end = int(nframes)
+    ############### Import BVH FILE and Transform it into Correct Plac Place############
+    bpy.ops.import_anim.bvh(filepath=r'Moves/base_coord.bvh', axis_forward='Y', axis_up='Z')
+    obj_mo= bpy.data.objects['base_coord']
+    obj_mo.data.pose_position = 'REST'
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT') #deselect all objects
+
+    bpy.ops.object.mode_set(mode='EDIT')
+    obj_mo.select_set(state=True)
+
+    bpy.context.view_layer.objects.active = obj_mo
+    b = bpy.context.scene.objects['base_coord']
+    b.location.z = .91190
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    ############### PART 1 END ############
+
+    ############### SET AUTOMATIC WEIGHTS ##############
+
+    obj_ch1= bpy.data.objects['GEO-vincent_body']
+    obj_ch2= bpy.data.objects['GEO-vincent_head']
+    obj_ch3= bpy.data.objects['GEO-vincent_hair']
+    obj_ch4= bpy.data.objects['GEO-vincent_eyeball_L']
+    obj_ch5= bpy.data.objects['GEO-vincent_eyeball_R']
+    obj_ch6= bpy.data.objects['GEO-vincent_eyeglasses']
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.active_object.select_get()
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT') #deselect all objects
+
+
+    obj_ch1.select_set(state=True)
+    obj_ch2.select_set(state=True)
+    obj_ch3.select_set(state=True)
+    obj_ch4.select_set(state=True)
+    obj_ch5.select_set(state=True)
+    #obj_ch6.select_set(state=True)
+    obj_mo.select_set(state=True)
+    bpy.context.view_layer.objects.active = obj_mo
+    bpy.ops.object.parent_set(type='ARMATURE_AUTO', keep_transform=True)
+
+    obj_mo.data.pose_position = 'POSE'
+
+    ########################## PART 2 END ##########################
+
+    ### Rendering
+    #bpy.ops.render.play_rendered_anim()
+    bpy.ops.render.render(animation=True)
+
+
+class EchoServerProtocol(asyncio.Protocol):
+    def connection_made(self, transport):
+        peername = transport.get_extra_info('peername')
+        print('Connection from {}'.format(peername))
+        self.transport = transport
+
+    def data_received(self, data):
+        message = data.decode()
+        print('Data received: {!r}'.format(message))
+        render_pose(message)
+        print('Send: {!r}'.format(message))
+        self.transport.write(data)
+
+        print('Close the client socket')
+        self.transport.close()
+
+
+async def main():
+    # Get a reference to the event loop as we plan to use
+    # low-level APIs.
+    loop = asyncio.get_running_loop()
+
+    server = await loop.create_server(
+        lambda: EchoServerProtocol(),
+        '127.0.0.3', 8888)
+
+    async with server:
+        await server.serve_forever()
+
+
+asyncio.run(main())
