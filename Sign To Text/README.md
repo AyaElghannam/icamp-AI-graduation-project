@@ -27,7 +27,7 @@ We applied our knowledge and tried many deep learning algorithms in order to get
 ## Characters
 
 <p align="center">
-<img src="img\Char.png" alt="Characters"/>
+<img src="img\char.png" alt="Characters"/>
 </p>
 
 We found dataset consists of 54,049 images of [ArSL alphabets](https://data.mendeley.com/datasets/y7pckrw6z2/1) performed by more than 40 people for 32 standard Arabic signs and alphabets. The number of images per class differs from one class to another. The dataset gathered are of size 64 * 64 Pixels of grayscale.
