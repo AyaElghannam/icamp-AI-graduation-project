@@ -4,16 +4,18 @@ import copy
 
 
 
-def parse(*args):
+def parse(seq):
     sequence = []
-    for arg in args:
-        with open(arg) as f:
+    for w in seq:
+        with open(w) as f:
             sequence.append(Bvh(f.read()))
     return sequence
 
 
-def make_anime_transition(*args):
-    sequence = parse("Moves/base_coord_main.bvh",*args,"Moves/base_coord_main.bvh")
+def make_anime_transition(args):
+    args.insert(0,"Moves/base_coord_main.bvh")
+    args.append("Moves/base_coord_main.bvh")
+    sequence = parse(args)
     # initalize the List of Motion With First Move
     tot = []
     tot = [i for i in sequence[0].frames]

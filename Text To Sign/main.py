@@ -3,9 +3,26 @@ from maps import *
 import os, glob
 import asyncio
 import cv2
+import argparse
+
+
+#parser = argparse.ArgumentParser(description='Process sentence.')
+#parser.add_argument('--input', action='store', type=str, required=True)
+#args = parser.parse_args()
+
+with open('input.txt',encoding='utf-8') as f:
+    lines = f.readlines()
+    
+#print(lines)
+ss = [file_move.get(eng_ara.get(w)) for w in lines[0].split()]
+print(ss)
+
+sentence = ','.join(ss)
+f.close()
+#print(sentence)
 
 Status = None
-nframes = make_anime_transition(file_move['i'],file_move['live'],file_move['egypt'])
+nframes = make_anime_transition(ss)#file_move['hello'])#,file_move['live'],file_move['egypt'])
 
 class EchoClientProtocol(asyncio.Protocol):
     def __init__(self, message, on_con_lost):
@@ -47,6 +64,10 @@ async def main(nframes):
 
 asyncio.run(main(nframes))
 
+
+
+
+
 # Save anim to disk
 # get all Filenames of Frames
 path = "./rendering/*.jpg"
@@ -79,8 +100,9 @@ if (cap.isOpened()== False):
 while(cap.isOpened()):
   # Capture frame-by-frame
     ret, frame = cap.read()
+    
     if ret == True:
-
+        frame = cv2.resize(frame, (1344,756), interpolation =cv2.INTER_AREA)
         # Display the resulting frame
         winname = "Signara"
         cv2.namedWindow(winname)        # Create a named window
@@ -103,3 +125,4 @@ while(1):
         cap.release()
         cv2.destroyAllWindows()
         break
+
